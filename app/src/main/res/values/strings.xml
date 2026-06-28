@@ -1,0 +1,35 @@
+<resources>
+    <string name="app_name">WrbTechAssessment</string>
+    <string name="unknown_location">Unknown</string>
+    <string name="add_city">Add</string>
+    <string name="menu">Menu</string>
+    <string name="aqi_label">AQI 26</string>
+    <string name="my_location">My Location</string>
+
+    <!-- Forecast -->
+    <string name="five_day_forecast">5-day forecast</string>
+    <string name="twenty_four_hour_forecast">24-hour forecast</string>
+    <string name="today">Today</string>
+    <string name="tomorrow">Tomorrow</string>
+    <string name="now">Now</string>
+
+    <!-- Details -->
+    <string name="uv_index">UV</string>
+    <string name="humidity">Humidity</string>
+    <string name="real_feel">Real feel</string>
+    <string name="wind">Wind</string>
+    <string name="sunrise">Sunrise</string>
+    <string name="sunset">Sunset</string>
+    <string name="pressure">Pressure</string>
+    <string name="uv_weak">Weak</string>
+
+    <!-- Units -->
+    <string name="unit_km_h">km/h</string>
+    <string name="unit_hpa">hPa</string>
+
+    <!-- Errors -->
+    <string name="error_location_disabled">Couldn\'t retrieve location. Make sure to grant permission and enable GPS.</string>
+    <string name="error_no_internet">Check your internet connection</string>
+    <string name="error_city_not_found">City not found</string>
+    <string name="error_network_generic">Network error: %s</string>
+</resources>
