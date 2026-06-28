@@ -8,9 +8,9 @@ A modern Android weather application built using **Jetpack Compose**, **Clean Ar
 |:---:|:---:|:---:|:---:|
 | <img src="screenshots/location_permission.png" width="200"> | <img src="screenshots/notification_permission.png" width="200"> | <img src="screenshots/background_alert.png" width="200"> | <img src="screenshots/dashboard_hoskote.png" width="200"> |
 
-| Main Dashboard (Details) | Manage Cities | Dashboard (Sydney) | Dashboard (New York) |
-|:---:|:---:|:---:|:---:|
-| <img src="screenshots/dashboard_details.png" width="200"> | <img src="screenshots/manage_cities.png" width="200"> | <img src="screenshots/dashboard_sydney.png" width="200"> | <img src="screenshots/dashboard_newyork.png" width="200"> |
+|                 Main Dashboard (Details)                 | Manage Cities | Dashboard (Sydney) | Dashboard (New York) |
+|:--------------------------------------------------------:|:---:|:---:|:---:|
+| <img src="screenshots/dashboard_manage.png" width="200"> | <img src="screenshots/manage_cities.png" width="200"> | <img src="screenshots/dashboard_sydney.png" width="200"> | <img src="screenshots/dashboard_newyork.png" width="200"> |
 
 | Dashboard (Pitampura) | Notification Tray |
 |:---:|:---:|
