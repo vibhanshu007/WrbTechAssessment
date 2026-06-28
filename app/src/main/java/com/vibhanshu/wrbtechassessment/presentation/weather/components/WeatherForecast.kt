@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -28,11 +29,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vibhanshu.wrbtechassessment.R
+import com.vibhanshu.wrbtechassessment.domain.model.WeatherData
 import com.vibhanshu.wrbtechassessment.domain.model.WeatherType
 import com.vibhanshu.wrbtechassessment.presentation.weather.WeatherState
 import java.time.Instant
@@ -78,9 +83,11 @@ fun DailyForecastCard(
                     val minTemp = dayData.minOf { it.temperatureCelsius }
                     val maxTemp = dayData.maxOf { it.temperatureCelsius }
                     val weatherType = dayData.first().weatherType
-                    val dayName = if (date == java.time.LocalDate.now()) stringResource(R.string.today) 
-                                 else if (date == java.time.LocalDate.now().plusDays(1)) stringResource(R.string.tomorrow)
-                                 else date.dayOfWeek.name.lowercase().replaceFirstChar { it.uppercase(Locale.getDefault()) }
+                    val dayName = when (date) {
+                        java.time.LocalDate.now() -> stringResource(R.string.today)
+                        java.time.LocalDate.now().plusDays(1) -> stringResource(R.string.tomorrow)
+                        else -> date.dayOfWeek.name.lowercase().replaceFirstChar { it.uppercase(Locale.getDefault()) }
+                    }
 
                     DailyForecastItem(
                         day = dayName,
@@ -182,6 +189,42 @@ fun TemperatureBar(
 }
 
 @Composable
+fun TemperatureTrendLine(
+    data: List<WeatherData>,
+    modifier: Modifier = Modifier
+) {
+    if (data.isEmpty()) return
+    
+    val maxTemp = data.maxOf { it.temperatureCelsius }
+    val minTemp = data.minOf { it.temperatureCelsius }
+    val range = (maxTemp - minTemp).coerceAtLeast(1.0)
+
+    Canvas(modifier = modifier) {
+        val width = size.width
+        val height = size.height
+        val spacing = width / (data.size - 1).coerceAtLeast(1)
+        
+        val path = Path()
+        data.forEachIndexed { index, weatherData ->
+            val x = index * spacing
+            val y = height - (((weatherData.temperatureCelsius - minTemp) / range) * height).toFloat()
+            
+            if (index == 0) {
+                path.moveTo(x, y)
+            } else {
+                path.lineTo(x, y)
+            }
+        }
+        
+        drawPath(
+            path = path,
+            color = Color.Yellow,
+            style = Stroke(width = 2.dp.toPx(), cap = StrokeCap.Round)
+        )
+    }
+}
+
+@Composable
 fun HourlyForecastCard(
     state: WeatherState,
     backgroundColor: Color,
@@ -202,6 +245,15 @@ fun HourlyForecastCard(
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 
+                Box(modifier = Modifier.fillMaxWidth().height(40.dp)) {
+                    TemperatureTrendLine(
+                        data = hourlyData,
+                        modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
                 LazyRow(
                     contentPadding = PaddingValues(horizontal = 4.dp),
                     horizontalArrangement = Arrangement.spacedBy(16.dp)

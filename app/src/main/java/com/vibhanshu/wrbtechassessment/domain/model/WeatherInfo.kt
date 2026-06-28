@@ -5,6 +5,7 @@ data class WeatherInfo(
     val forecastData: List<WeatherData>,
     val cityName: String,
     val country: String = "",
+    val aqi: Double = 0.0,
     val sunrise: Long = 0,
     val sunset: Long = 0
 )

@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.vibhanshu.wrbtechassessment.R
 import com.vibhanshu.wrbtechassessment.core.util.Resource
 import com.vibhanshu.wrbtechassessment.domain.location.LocationTracker
+import com.vibhanshu.wrbtechassessment.domain.model.WeatherInfo
 import com.vibhanshu.wrbtechassessment.domain.usecase.GetWeatherUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,6 +31,46 @@ class WeatherViewModel @Inject constructor(
             getWeatherUseCase.getLatestCachedWeather()?.let { info ->
                 _state.update { it.copy(weatherInfo = info) }
             }
+            loadSearchHistory()
+        }
+    }
+
+    fun onSearchQueryChange(query: String) {
+        _state.update { it.copy(searchQuery = query) }
+    }
+
+    fun selectHistoryItem(weatherInfo: WeatherInfo) {
+        _state.update { it.copy(weatherInfo = weatherInfo) }
+    }
+
+    fun searchCity(cityName: String) {
+        viewModelScope.launch {
+            _state.update { it.copy(isLoading = true, error = null, searchQuery = "") }
+            getWeatherUseCase.getWeatherByCity(cityName).collect { result ->
+                handleResult(result)
+                if (result is Resource.Success) {
+                    loadSearchHistory()
+                }
+            }
+        }
+    }
+
+    fun loadWeatherWithCoordinates(lat: Double, lon: Double, cityName: String) {
+        viewModelScope.launch {
+            _state.update { it.copy(isLoading = true, error = null) }
+            getWeatherUseCase(lat, lon, true).collect { result ->
+                handleResult(result)
+                if (result is Resource.Success) {
+                    loadSearchHistory()
+                }
+            }
+        }
+    }
+
+    fun loadSearchHistory() {
+        viewModelScope.launch {
+            val history = getWeatherUseCase.getAllWeatherHistory()
+            _state.update { it.copy(searchHistory = history) }
         }
     }
 

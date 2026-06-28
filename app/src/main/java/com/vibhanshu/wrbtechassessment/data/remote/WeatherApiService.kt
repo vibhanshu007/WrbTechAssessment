@@ -29,6 +29,13 @@ interface WeatherApiService {
         @Query("lang") lang: String = "en"
     ): ForecastDto
 
+    @GET("data/2.5/air_pollution")
+    suspend fun getAirPollutionData(
+        @Query("lat") lat: Double,
+        @Query("lon") lon: Double,
+        @Query("appid") apiKey: String
+    ): AirPollutionDto
+
     companion object {
         const val BASE_URL = "https://api.openweathermap.org/"
     }

@@ -20,6 +20,9 @@ interface WeatherDao {
     @Query("SELECT * FROM weather_table ORDER BY lastUpdated DESC LIMIT 1")
     suspend fun getLatestWeatherSync(): WeatherEntity?
 
+    @Query("SELECT * FROM weather_table ORDER BY lastUpdated DESC")
+    suspend fun getAllWeatherHistory(): List<WeatherEntity>
+
     @Query("DELETE FROM weather_table")
     suspend fun clearWeather()
 }

@@ -11,6 +11,7 @@ import com.vibhanshu.wrbtechassessment.data.remote.GoogleGeocodingApiService
 import com.vibhanshu.wrbtechassessment.data.remote.WeatherApiService
 import com.vibhanshu.wrbtechassessment.domain.model.WeatherInfo
 import com.vibhanshu.wrbtechassessment.domain.repository.WeatherRepository
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import java.util.Locale
@@ -41,16 +42,34 @@ class WeatherRepositoryImpl @Inject constructor(
         } catch (e: Exception) { null }
         
         if (initialData != null) {
-            try {
-                val weatherInfo = gson.fromJson(initialData.weatherDataJson, WeatherInfo::class.java)
+            val weatherInfo = try {
+                gson.fromJson(initialData.weatherDataJson, WeatherInfo::class.java)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
+            }
+
+            if (weatherInfo != null) {
                 emit(Resource.Success(weatherInfo))
-            } catch (e: Exception) { e.printStackTrace() }
+
+                // Smart Refresh: If data is fresh enough, don't fetch from remote
+                val isDataFresh = System.currentTimeMillis() - initialData.lastUpdated < Constants.CACHE_TTL_MILLIS
+                if (isDataFresh && !fetchFromRemote) {
+                    emit(Resource.Loading(false))
+                    return@flow
+                }
+            }
         }
 
-        if (fetchFromRemote) {
+        val shouldFetch = fetchFromRemote || initialData == null || (System.currentTimeMillis() - initialData.lastUpdated >= Constants.CACHE_TTL_MILLIS)
+
+        if (shouldFetch) {
             try {
                 val weatherResponse = api.getWeatherData(lat, lon, BuildConfig.OPENWEATHER_API_KEY)
                 val forecastResponse = api.getForecastData(lat, lon, BuildConfig.OPENWEATHER_API_KEY)
+                val airPollutionResponse = try {
+                    api.getAirPollutionData(lat, lon, BuildConfig.OPENWEATHER_API_KEY)
+                } catch (e: Exception) { null }
 
                 var cityName = weatherResponse.name
                 var countryName = weatherResponse.sys.country
@@ -68,7 +87,7 @@ class WeatherRepositoryImpl @Inject constructor(
                     }
                 } catch (e: Exception) { e.printStackTrace() }
 
-                val weatherInfo = weatherResponse.toWeatherInfo(forecastResponse).copy(
+                val weatherInfo = weatherResponse.toWeatherInfo(forecastResponse, airPollutionResponse).copy(
                     cityName = cityName,
                     country = countryName
                 )
@@ -83,6 +102,7 @@ class WeatherRepositoryImpl @Inject constructor(
                 
                 emit(Resource.Success(weatherInfo))
             } catch (e: Exception) {
+                if (e is CancellationException) throw e
                 e.printStackTrace()
                 val anyCache = dao.getLatestWeatherSync()
                 if (anyCache == null) {
@@ -96,7 +116,7 @@ class WeatherRepositoryImpl @Inject constructor(
 
     override fun getWeatherByCity(cityName: String): Flow<Resource<WeatherInfo>> = flow {
         emit(Resource.Loading(true))
-        try {
+        val weatherResult = try {
             val googleResponse = googleApi.getCoordinatesFromAddress(cityName, BuildConfig.GOOGLE_MAPS_API_KEY)
             
             if (googleResponse.status == "OK" && googleResponse.results.isNotEmpty()) {
@@ -113,7 +133,11 @@ class WeatherRepositoryImpl @Inject constructor(
 
                 val weatherResponse = api.getWeatherData(lat, lon, BuildConfig.OPENWEATHER_API_KEY)
                 val forecastResponse = api.getForecastData(lat, lon, BuildConfig.OPENWEATHER_API_KEY)
-                val weatherInfo = weatherResponse.toWeatherInfo(forecastResponse).copy(
+                val airPollutionResponse = try {
+                    api.getAirPollutionData(lat, lon, BuildConfig.OPENWEATHER_API_KEY)
+                } catch (e: Exception) { null }
+
+                val weatherInfo = weatherResponse.toWeatherInfo(forecastResponse, airPollutionResponse).copy(
                     cityName = actualCityName,
                     country = actualCountryName
                 )
@@ -130,21 +154,33 @@ class WeatherRepositoryImpl @Inject constructor(
                     )
                 )
                 
-                emit(Resource.Success(weatherInfo))
+                Resource.Success(weatherInfo)
             } else {
-                emit(Resource.Error("City not found"))
+                Resource.Error("City not found")
             }
         } catch (e: Exception) {
+            if (e is CancellationException) throw e
             e.printStackTrace()
-            emit(Resource.Error("Network error: ${e.message}"))
-        } finally {
-            emit(Resource.Loading(false))
+            Resource.Error("Network error: ${e.message}")
         }
+
+        emit(weatherResult)
+        emit(Resource.Loading(false))
     }
 
     override suspend fun getLatestCachedWeather(): WeatherInfo? {
         return dao.getLatestWeatherSync()?.let { entity ->
             gson.fromJson(entity.weatherDataJson, WeatherInfo::class.java)
+        }
+    }
+
+    override suspend fun getAllWeatherHistory(): List<WeatherInfo> {
+        return dao.getAllWeatherHistory().mapNotNull { entity ->
+            try {
+                gson.fromJson(entity.weatherDataJson, WeatherInfo::class.java)
+            } catch (e: Exception) {
+                null
+            }
         }
     }
 }

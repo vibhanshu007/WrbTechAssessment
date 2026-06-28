@@ -17,8 +17,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Eco
 import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -34,9 +35,11 @@ import com.vibhanshu.wrbtechassessment.domain.model.WeatherType
 import com.vibhanshu.wrbtechassessment.presentation.weather.WeatherState
 import kotlin.math.roundToInt
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WeatherHeader(
     state: WeatherState,
+    onSearchCity: () -> Unit,
     modifier: Modifier = Modifier,
     textColor: Color = Color.White
 ) {
@@ -85,19 +88,14 @@ fun WeatherHeader(
                     }
                 }
                 Row {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = stringResource(R.string.add_city),
-                        tint = textColor,
-                        modifier = Modifier.size(28.dp)
-                    )
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Icon(
-                        imageVector = Icons.Default.MoreVert,
-                        contentDescription = stringResource(R.string.menu),
-                        tint = textColor,
-                        modifier = Modifier.size(28.dp)
-                    )
+                    IconButton(onClick = { onSearchCity() }) {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = stringResource(R.string.add_city),
+                            tint = textColor,
+                            modifier = Modifier.size(28.dp)
+                        )
+                    }
                 }
             }
 
@@ -162,8 +160,9 @@ fun WeatherHeader(
                         tint = textColor
                     )
                     Spacer(modifier = Modifier.width(6.dp))
+                    val aqi = info.aqi
                     Text(
-                        text = stringResource(R.string.aqi_label),
+                        text = stringResource(R.string.aqi_label, aqi.roundToInt()),
                         fontSize = 14.sp,
                         color = textColor,
                         fontWeight = FontWeight.Medium

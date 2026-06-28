@@ -3,7 +3,12 @@
     <string name="unknown_location">Unknown</string>
     <string name="add_city">Add</string>
     <string name="menu">Menu</string>
-    <string name="aqi_label">AQI 26</string>
+    <string name="aqi_label">AQI %1$d</string>
+    <string name="aqi_good">Good</string>
+    <string name="aqi_fair">Fair</string>
+    <string name="aqi_moderate">Moderate</string>
+    <string name="aqi_poor">Poor</string>
+    <string name="aqi_very_poor">Very Poor</string>
     <string name="my_location">My Location</string>
 
     <!-- Forecast -->
@@ -32,4 +37,10 @@
     <string name="error_no_internet">Check your internet connection</string>
     <string name="error_city_not_found">City not found</string>
     <string name="error_network_generic">Network error: %s</string>
+
+    <!-- Search Screen -->
+    <string name="manage_cities">Manage cities</string>
+    <string name="current_location">Current location</string>
+    <string name="default_cities">Default cities</string>
+    <string name="back">Back</string>
 </resources>

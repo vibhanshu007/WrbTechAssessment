@@ -1,12 +1,16 @@
 package com.vibhanshu.wrbtechassessment.data.mapper
 
+import com.vibhanshu.wrbtechassessment.data.remote.AirPollutionDto
 import com.vibhanshu.wrbtechassessment.data.remote.ForecastDto
 import com.vibhanshu.wrbtechassessment.data.remote.WeatherDto
 import com.vibhanshu.wrbtechassessment.domain.model.WeatherData
 import com.vibhanshu.wrbtechassessment.domain.model.WeatherInfo
 import com.vibhanshu.wrbtechassessment.domain.model.WeatherType
 
-fun WeatherDto.toWeatherInfo(forecastDto: ForecastDto? = null): WeatherInfo {
+fun WeatherDto.toWeatherInfo(
+    forecastDto: ForecastDto? = null,
+    airPollutionDto: AirPollutionDto? = null
+): WeatherInfo {
     return WeatherInfo(
         currentWeatherData = WeatherData(
             time = dt * 1000,
@@ -34,6 +38,7 @@ fun WeatherDto.toWeatherInfo(forecastDto: ForecastDto? = null): WeatherInfo {
         } ?: emptyList(),
         cityName = name,
         country = sys.country,
+        aqi = airPollutionDto?.list?.firstOrNull()?.components?.o3 ?: 0.0,
         sunrise = sys.sunrise * 1000,
         sunset = sys.sunset * 1000
     )
