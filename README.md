@@ -21,7 +21,8 @@ A modern Android weather application built using **Jetpack Compose**, **Clean Ar
 - **Current Location Weather**: Automatically detects your location to show local weather.
 - **Manage Cities**: A dedicated screen to view weather for major global cities (Sydney, Tokyo, London, etc.).
 - **Offline First**: All weather data is cached in a local Room database for offline viewing.
-- **Background Sync**: Periodic background updates using WorkManager with high-priority notifications for extreme weather.
+- **Background Sync**: The app is scheduled to sync every **30 minutes** in the background using WorkManager (see `WeatherApp.kt`).
+- **Weather Alerts**: Automatically sends a high-priority **Notification** if it detects severe conditions like **Heavy Rain**, **Heavy Thunderstorms**, or **Moderate Thunderstorms** during a background sync (see `WeatherSyncWorker.kt`).
 - **Rich UI**: High-fidelity weather details including UV Index, Humidity, Air Quality, and Sun timings with custom Gauge visualizations.
 - **Modern Navigation**: Uses the latest Navigation 3 framework for type-safe screen transitions.
 
