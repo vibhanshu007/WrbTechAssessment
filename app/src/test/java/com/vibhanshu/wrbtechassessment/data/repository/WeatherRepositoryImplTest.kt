@@ -9,7 +9,6 @@ import com.vibhanshu.wrbtechassessment.data.local.WeatherDatabase
 import com.vibhanshu.wrbtechassessment.data.local.WeatherEntity
 import com.vibhanshu.wrbtechassessment.data.remote.GoogleGeocodingApiService
 import com.vibhanshu.wrbtechassessment.data.remote.WeatherApiService
-import com.vibhanshu.wrbtechassessment.domain.model.WeatherInfo
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk

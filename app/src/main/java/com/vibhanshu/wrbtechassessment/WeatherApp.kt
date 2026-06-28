@@ -28,7 +28,6 @@ class WeatherApp : Application(), Configuration.Provider {
     override fun onCreate() {
         super.onCreate()
         setupPeriodicWeatherSync()
-        triggerImmediateTestSync() // Runs immediately on app start for testing
     }
 
     private fun setupPeriodicWeatherSync() {
@@ -47,10 +46,5 @@ class WeatherApp : Application(), Configuration.Provider {
             ExistingPeriodicWorkPolicy.KEEP,
             syncRequest
         )
-    }
-
-    private fun triggerImmediateTestSync() {
-        val testRequest = OneTimeWorkRequestBuilder<WeatherSyncWorker>().build()
-        WorkManager.getInstance(this).enqueue(testRequest)
     }
 }

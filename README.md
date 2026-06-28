@@ -2,6 +2,20 @@
 
 A modern Android weather application built using **Jetpack Compose**, **Clean Architecture**, and **MVVM**. The app provides real-time weather updates, location-based weather tracking, background synchronization, and a manageable list of global cities.
 
+## 📸 Screenshots
+
+| Location Permission | Notification Permission | Background Alert | Main Dashboard |
+|:---:|:---:|:---:|:---:|
+| <img src="screenshots/location_permission.png" width="200"> | <img src="screenshots/notification_permission.png" width="200"> | <img src="screenshots/background_alert.png" width="200"> | <img src="screenshots/dashboard_hoskote.png" width="200"> |
+
+| Main Dashboard (Details) | Manage Cities | Dashboard (Sydney) | Dashboard (New York) |
+|:---:|:---:|:---:|:---:|
+| <img src="screenshots/dashboard_details.png" width="200"> | <img src="screenshots/manage_cities.png" width="200"> | <img src="screenshots/dashboard_sydney.png" width="200"> | <img src="screenshots/dashboard_newyork.png" width="200"> |
+
+| Dashboard (Pitampura) | Notification Tray |
+|:---:|:---:|
+| <img src="screenshots/dashboard_pitampura.png" width="200"> | <img src="screenshots/notification_tray.png" width="200"> |
+
 ## 📱 Features
 
 - **Current Location Weather**: Automatically detects your location to show local weather.
@@ -35,6 +49,14 @@ Follows the **MVVM (Model-View-ViewModel)** pattern:
 - **UI (Jetpack Compose)**: Declarative UI components.
 - **ViewModel**: Manages UI state using `StateFlow` and handles user interactions.
 - **Navigation**: Centralized type-safe navigation using Navigation 3.
+
+#### Why MVVM over MVI?
+While MVI (Model-View-Intent) provides strict unidirectional data flow and state consistency, **MVVM** was chosen for this project for several strategic reasons:
+- **Reduced Boilerplate**: MVVM avoids the verbose intent/action/reducer cycle required by MVI, making the codebase more maintainable for a project of this scale.
+- **Lifecycle Management**: `ViewModel` with `StateFlow` naturally integrates with Jetpack Compose, providing a robust way to handle configuration changes without the complexity of a centralized state store.
+- **Ease of Testing**: MVVM's separation of concerns allows for straightforward unit testing of business logic in the ViewModel without mocking complex intent streams.
+- **Performance**: For a weather application where UI updates are frequent but granular (e.g., individual gauge animations), MVVM's state observation is highly efficient.
+- **Project Scale**: MVI is typically best suited for large-scale enterprise applications with massive teams and extremely complex state interactions. For a focused utility application like this, the added overhead of MVI would provide diminishing returns compared to the speed and maintainability of MVVM.
 
 ---
 

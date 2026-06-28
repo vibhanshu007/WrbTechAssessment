@@ -29,13 +29,9 @@ class WeatherSyncWorker @AssistedInject constructor(
 ) : CoroutineWorker(context, workerParams) {
 
     override suspend fun doWork(): Result {
-        // STEP 1: Immediate notification to prove the worker started
-        showWeatherAlert("Background Sync Started")
-
         return try {
             val location = locationTracker.getCurrentLocation() 
             if (location == null) {
-                showWeatherAlert("Sync Error: Location not found")
                 return Result.retry()
             }
             
@@ -46,8 +42,6 @@ class WeatherSyncWorker @AssistedInject constructor(
             if (result is Resource.Success) {
                 val weather = result.data?.currentWeatherData
                 
-                showWeatherAlert("Sync Complete (Testing)")
-
                 // Advanced requirement: Alert on extreme weather
                 if ((weather?.weatherType is WeatherType.HeavyRain) || 
                     (weather?.weatherType is WeatherType.HeavyThunderstormWithHail) ||
@@ -56,11 +50,9 @@ class WeatherSyncWorker @AssistedInject constructor(
                 }
                 Result.success()
             } else {
-                showWeatherAlert("Sync Error: Network failed")
                 Result.retry()
             }
-        } catch (e: Exception) {
-            showWeatherAlert("Sync Fatal Error: ${e.message}")
+        } catch (_: Exception) {
             Result.failure()
         }
     }
