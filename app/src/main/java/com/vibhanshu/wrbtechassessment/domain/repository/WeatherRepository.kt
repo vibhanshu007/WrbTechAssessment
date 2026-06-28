@@ -16,6 +16,4 @@ interface WeatherRepository {
     ): Flow<Resource<WeatherInfo>>
 
     suspend fun getLatestCachedWeather(): WeatherInfo?
-
-    suspend fun getAllWeatherHistory(): List<WeatherInfo>
 }

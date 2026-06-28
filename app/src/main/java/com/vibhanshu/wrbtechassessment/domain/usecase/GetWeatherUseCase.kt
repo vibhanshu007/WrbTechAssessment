@@ -24,8 +24,4 @@ class GetWeatherUseCase @Inject constructor(
     suspend fun getLatestCachedWeather(): WeatherInfo? {
         return repository.getLatestCachedWeather()
     }
-
-    suspend fun getAllWeatherHistory(): List<WeatherInfo> {
-        return repository.getAllWeatherHistory()
-    }
 }

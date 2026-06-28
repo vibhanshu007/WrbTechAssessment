@@ -46,7 +46,7 @@ val defaultCities = listOf(
     DefaultCity("Delhi", 28.704059, 77.102490, "India"),
     DefaultCity("Dubai", 25.204849, 55.270783, "UAE"),
     DefaultCity("London", 51.507218, -0.127586, "UK"),
-    DefaultCity("New York", 40.712775, -74.005973, "USA")
+    DefaultCity("New York", 40.712775, -74.005973, "USA"),
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -98,7 +98,7 @@ fun SearchScreen(
                         maxTemp = current.currentWeatherData?.tempMax?.roundToInt() ?: 0,
                         minTemp = current.currentWeatherData?.tempMin?.roundToInt() ?: 0,
                         isCurrentLocation = true,
-                        onClick = { onBack() }
+                        onClick = onBack
                     )
                 }
             }
@@ -194,7 +194,7 @@ fun CityCard(
                         fontSize = 32.sp,
                         fontWeight = FontWeight.Light
                     )
-                    if (maxTemp != null && minTemp != null) {
+                    if ((maxTemp != null) && (minTemp != null)) {
                         Text(
                             text = "$maxTemp° / $minTemp°",
                             color = Color.Gray,

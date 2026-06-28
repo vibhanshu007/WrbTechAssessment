@@ -5,7 +5,6 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
@@ -26,7 +25,7 @@ class WeatherSyncWorker @AssistedInject constructor(
     @Assisted private val context: Context,
     @Assisted workerParams: WorkerParameters,
     private val getWeatherUseCase: GetWeatherUseCase,
-    private val locationTracker: LocationTracker
+    private val locationTracker: LocationTracker,
 ) : CoroutineWorker(context, workerParams) {
 
     override suspend fun doWork(): Result {
@@ -41,7 +40,7 @@ class WeatherSyncWorker @AssistedInject constructor(
             }
             
             // Collect the first result (success or error) from the flow
-            val result = getWeatherUseCase(location.latitude, location.longitude, true)
+            val result = getWeatherUseCase(lat = location.latitude, lon = location.longitude, fetchFromRemote = true)
                 .first { it !is Resource.Loading }
 
             if (result is Resource.Success) {
@@ -50,9 +49,9 @@ class WeatherSyncWorker @AssistedInject constructor(
                 showWeatherAlert("Sync Complete (Testing)")
 
                 // Advanced requirement: Alert on extreme weather
-                if (weather?.weatherType is WeatherType.HeavyRain || 
-                    weather?.weatherType is WeatherType.HeavyThunderstormWithHail ||
-                    weather?.weatherType is WeatherType.ModerateThunderstorm) {
+                if ((weather?.weatherType is WeatherType.HeavyRain) || 
+                    (weather?.weatherType is WeatherType.HeavyThunderstormWithHail) ||
+                    (weather?.weatherType is WeatherType.ModerateThunderstorm)) {
                     showWeatherAlert("Extreme Weather: " + weather.weatherType.description)
                 }
                 Result.success()
@@ -70,10 +69,8 @@ class WeatherSyncWorker @AssistedInject constructor(
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val channelId = Constants.NOTIFICATION_CHANNEL_ID
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(channelId, Constants.NOTIFICATION_CHANNEL_NAME, NotificationManager.IMPORTANCE_HIGH)
-            notificationManager.createNotificationChannel(channel)
-        }
+        val channel = NotificationChannel(channelId, Constants.NOTIFICATION_CHANNEL_NAME, NotificationManager.IMPORTANCE_HIGH)
+        notificationManager.createNotificationChannel(channel)
 
         val intent = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK

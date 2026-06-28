@@ -37,7 +37,7 @@ class WeatherApp : Application(), Configuration.Provider {
             .build()
 
         val syncRequest = PeriodicWorkRequestBuilder<WeatherSyncWorker>(
-            1, TimeUnit.HOURS
+            30, TimeUnit.MINUTES
         )
             .setConstraints(constraints)
             .build()

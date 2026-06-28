@@ -20,7 +20,7 @@ import javax.inject.Inject
 class WeatherRepositoryImpl @Inject constructor(
     private val api: WeatherApiService,
     private val googleApi: GoogleGeocodingApiService,
-    private val db: WeatherDatabase,
+    db: WeatherDatabase,
     private val gson: Gson
 ) : WeatherRepository {
 
@@ -35,11 +35,11 @@ class WeatherRepositoryImpl @Inject constructor(
 
         val roundedLat = String.format(Locale.US, Constants.ROUNDED_COORDINATE_FORMAT, lat).toDouble()
         val roundedLon = String.format(Locale.US, Constants.ROUNDED_COORDINATE_FORMAT, lon).toDouble()
-        val cityId = "${roundedLat},${roundedLon}"
+        val cityId = "$roundedLat,$roundedLon"
 
         val initialData = try {
             dao.getWeatherByCitySync(cityId) ?: dao.getLatestWeatherSync()
-        } catch (e: Exception) { null }
+        } catch (_: Exception) { null }
         
         if (initialData != null) {
             val weatherInfo = try {
@@ -69,7 +69,7 @@ class WeatherRepositoryImpl @Inject constructor(
                 val forecastResponse = api.getForecastData(lat, lon, BuildConfig.OPENWEATHER_API_KEY)
                 val airPollutionResponse = try {
                     api.getAirPollutionData(lat, lon, BuildConfig.OPENWEATHER_API_KEY)
-                } catch (e: Exception) { null }
+                } catch (_: Exception) { null }
 
                 var cityName = weatherResponse.name
                 var countryName = weatherResponse.sys.country
@@ -85,7 +85,7 @@ class WeatherRepositoryImpl @Inject constructor(
                         val countryComponent = addressComponents.find { it.types.contains("country") }
                         countryName = countryComponent?.longName ?: weatherResponse.sys.country
                     }
-                } catch (e: Exception) { e.printStackTrace() }
+                } catch (_: Exception) { }
 
                 val weatherInfo = weatherResponse.toWeatherInfo(forecastResponse, airPollutionResponse).copy(
                     cityName = cityName,
@@ -135,7 +135,7 @@ class WeatherRepositoryImpl @Inject constructor(
                 val forecastResponse = api.getForecastData(lat, lon, BuildConfig.OPENWEATHER_API_KEY)
                 val airPollutionResponse = try {
                     api.getAirPollutionData(lat, lon, BuildConfig.OPENWEATHER_API_KEY)
-                } catch (e: Exception) { null }
+                } catch (_: Exception) { null }
 
                 val weatherInfo = weatherResponse.toWeatherInfo(forecastResponse, airPollutionResponse).copy(
                     cityName = actualCityName,
@@ -144,7 +144,7 @@ class WeatherRepositoryImpl @Inject constructor(
                 
                 val roundedLat = String.format(Locale.US, Constants.ROUNDED_COORDINATE_FORMAT, lat).toDouble()
                 val roundedLon = String.format(Locale.US, Constants.ROUNDED_COORDINATE_FORMAT, lon).toDouble()
-                val cityId = "${roundedLat},${roundedLon}"
+                val cityId = "$roundedLat,$roundedLon"
 
                 dao.insertWeather(
                     WeatherEntity(
@@ -171,16 +171,6 @@ class WeatherRepositoryImpl @Inject constructor(
     override suspend fun getLatestCachedWeather(): WeatherInfo? {
         return dao.getLatestWeatherSync()?.let { entity ->
             gson.fromJson(entity.weatherDataJson, WeatherInfo::class.java)
-        }
-    }
-
-    override suspend fun getAllWeatherHistory(): List<WeatherInfo> {
-        return dao.getAllWeatherHistory().mapNotNull { entity ->
-            try {
-                gson.fromJson(entity.weatherDataJson, WeatherInfo::class.java)
-            } catch (e: Exception) {
-                null
-            }
         }
     }
 }

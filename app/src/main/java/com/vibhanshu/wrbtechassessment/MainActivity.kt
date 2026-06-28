@@ -67,14 +67,14 @@ class MainActivity : ComponentActivity() {
                             state = state,
                             viewModel = viewModel,
                             weatherColors = weatherColors,
-                            onNavigateToSearch = { backStack.add(Screen.Search) }
+                            onNavigateToSearch = { backStack.add(Screen.Search) },
                         )
                     }
                     addEntryProvider(Screen.Search) {
                         SearchScreen(
                             state = state,
-                            onCitySelected = { lat, lon, name ->
-                                viewModel.loadWeatherWithCoordinates(lat, lon, name)
+                            onCitySelected = { lat, lon, _ ->
+                                viewModel.loadWeatherWithCoordinates(lat, lon)
                                 backStack.removeAt(backStack.size - 1)
                             },
                             onBack = { backStack.removeAt(backStack.size - 1) }
@@ -90,8 +90,8 @@ class MainActivity : ComponentActivity() {
                 val permissionLauncher = rememberLauncherForActivityResult(
                     contract = ActivityResultContracts.RequestMultiplePermissions()
                 ) { permissions ->
-                    if (permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
-                        permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true) {
+                    if ((permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true) ||
+                        (permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true)) {
                         viewModel.loadWeatherInfo()
                     }
                 }

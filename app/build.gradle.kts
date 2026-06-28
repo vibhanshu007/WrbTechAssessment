@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.kover)
 }
 
 val localProperties = Properties()
@@ -32,6 +33,9 @@ android {
     }
 
     buildTypes {
+        debug {
+            enableUnitTestCoverage = true
+        }
         release {
             optimization {
                 enable = false
@@ -100,4 +104,23 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
+}
+
+kover {
+    reports {
+        filters {
+            excludes {
+                classes(
+                    "*.BuildConfig",
+                    "*_Factory*",
+                    "*_HiltModules*",
+                    "*.Hilt_*",
+                    "*_MembersInjector*",
+                    "*_ViewBinding*",
+                    "com.vibhanshu.wrbtechassessment.ui.theme.*",
+                    "com.vibhanshu.wrbtechassessment.di.*"
+                )
+            }
+        }
+    }
 }
